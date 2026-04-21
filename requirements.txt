@@ -1,0 +1,6 @@
+streamlit
+semantic-kernel
+python-dotenv
+fpdf2
+duckduckgo-search
+pypdf
