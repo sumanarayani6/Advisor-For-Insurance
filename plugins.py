@@ -97,6 +97,12 @@ class InsuranceWorkPlugin:
         name="CreateCustomPDF"
     )
     def create_custom_pdf(self, content: str, style_config: dict) -> str:
+        style_config = {
+            "title": "Insurance Analysis",
+            "header_bg": (36, 44, 52),
+            "accent_color": (0, 51, 102),
+            "filename": filename
+        }
         content = content.replace("₹", "Rs. ")
         pdf = DynamicPDF(style_config)
         pdf.add_page()
