@@ -11,7 +11,8 @@ from dotenv import load_dotenv
 
 # Semantic Kernel Imports
 from semantic_kernel import Kernel
-from semantic_kernel.connectors.ai.google.google_ai.services.google_ai_chat_completion import GoogleAIChatCompletion
+#from semantic_kernel.connectors.ai.google.google_ai.services.google_ai_chat_completion import GoogleAIChatCompletion
+from semantic_kernel.connectors.ai.google.gemini import GeminiChatCompletion
 from semantic_kernel.connectors.ai.function_choice_behavior import FunctionChoiceBehavior
 from semantic_kernel.connectors.ai.google.google_ai.google_ai_prompt_execution_settings import GoogleAIPromptExecutionSettings
 from plugins import InsuranceWorkPlugin, WebSearchPlugin
@@ -24,7 +25,7 @@ async def run_agent(user_input, chat_history):
     kernel = Kernel()
     
     # Add the Gemini Service
-    kernel.add_service(GoogleAIChatCompletion(
+    kernel.add_service(GeminiChatCompletion(
         gemini_model_id="gemini-3-flash-preview", 
         api_key=os.getenv("GEMINI_API_KEY")
     ))
