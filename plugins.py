@@ -5,10 +5,9 @@ from duckduckgo_search import DDGS
 from semantic_kernel.functions import kernel_function
 
 
-import chromadb
 from pypdf import PdfReader
 from semantic_kernel.functions import kernel_function
-import uuid
+# import uuid
 
 class InsuranceMathPlugin:
     @kernel_function(
