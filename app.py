@@ -8,13 +8,13 @@ except ImportError:
 import streamlit as st
 import asyncio, os
 from dotenv import load_dotenv
-
 # Semantic Kernel Imports
 from semantic_kernel import Kernel
-from semantic_kernel.connectors.ai.google.google_ai import GoogleAIChatCompletion
+from semantic_kernel.connectors.ai.google.google_ai.services.google_ai_chat_completion import GoogleAIChatCompletion
 from semantic_kernel.connectors.ai.function_choice_behavior import FunctionChoiceBehavior
-from semantic_kernel.connectors.ai.google.google_ai import GoogleAIPromptExecutionSettings
+from semantic_kernel.connectors.ai.google.google_ai.google_ai_prompt_execution_settings import GoogleAIPromptExecutionSettings
 from plugins import InsuranceWorkPlugin, WebSearchPlugin
+
 
 load_dotenv()
 
