@@ -24,7 +24,7 @@ async def run_agent(user_input, chat_history):
     kernel = Kernel()
     
     # Add the Gemini Service
-    kernel.add_service(GeminiChatCompletion(
+    kernel.add_service(GoogleAIChatCompletion(
         gemini_model_id="gemini-3-flash-preview", 
         api_key=os.getenv("GEMINI_API_KEY")
     ))
