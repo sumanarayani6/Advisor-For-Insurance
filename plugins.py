@@ -91,33 +91,34 @@ class DynamicPDF(FPDF):
         self.cell(0, 15, self.style.get("title", "Insurance Report").upper(), align="C")
         self.ln(20)
 
-class InsuranceWorkPlugin:
-    @kernel_function(
-        description="Generates a professional PDF. Automatically detects tables.",
-        name="CreateCustomPDF"
-    )
-    def create_custom_pdf(self, content: str, style_config: dict) -> str:
-        style_config = {
-            "title": "Insurance Analysis",
-            "header_bg": (36, 44, 52),
-            "accent_color": (0, 51, 102),
-            "filename": filename
-        }
-        content = content.replace("₹", "Rs. ")
-        pdf = DynamicPDF(style_config)
-        pdf.add_page()
-        accent = style_config.get("accent_color", (0, 51, 102))
+@kernel_function(
+    description="Generates a professional PDF report.",
+    name="CreateCustomPDF"
+)
+def create_custom_pdf(self, content: str, filename: str = "Insurance_Report") -> str:
+    # Use the passed 'filename' or a default
+    clean_filename = filename.replace(' ', '_')
+    
+    style_config = {
+        "title": "Insurance Analysis",
+        "header_bg": (36, 44, 52),
+        "accent_color": (0, 51, 102),
+        "filename": clean_filename
+    }
+    
+    content = content.replace("₹", "Rs. ")
+    pdf = DynamicPDF(style_config)
+    pdf.add_page()
+    accent = style_config.get("accent_color", (0, 51, 102))
 
-        # Check if content has a table (look for Markdown | symbols)
-        if "|" in content and "---" in content:
-            self._render_table(pdf, content, accent)
-        else:
-            self._render_text(pdf, content, accent)
-        
-        filename = style_config.get("filename", "Insurance_Report")
-        full_path = f"{filename.replace(' ', '_')}.pdf"
-        pdf.output(full_path)
-        return full_path
+    if "|" in content and "---" in content:
+        self._render_table(pdf, content, accent)
+    else:
+        self._render_text(pdf, content, accent)
+    
+    full_path = f"{clean_filename}.pdf"
+    pdf.output(full_path)
+    return full_path
 
     def _render_table(self, pdf, content, accent):
         # Professional Table Logic
