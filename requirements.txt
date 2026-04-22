@@ -7,3 +7,4 @@ python-dotenv
 fpdf2
 pypdf
 ddgs
+pysqlite3-binary
