@@ -96,14 +96,15 @@ class DynamicPDF(FPDF):
     name="CreateCustomPDF"
 )
 def create_custom_pdf(self, content: str, filename: str = "Insurance_Report") -> str:
-    # Use the passed 'filename' or a default
-    clean_filename = filename.replace(' ', '_')
+    # 1. Define the filename clearly first
+    safe_filename = filename.replace(' ', '_')
     
+    # 2. Now use it in the config
     style_config = {
         "title": "Insurance Analysis",
         "header_bg": (36, 44, 52),
         "accent_color": (0, 51, 102),
-        "filename": clean_filename
+        "filename": safe_filename
     }
     
     content = content.replace("₹", "Rs. ")
@@ -116,7 +117,7 @@ def create_custom_pdf(self, content: str, filename: str = "Insurance_Report") ->
     else:
         self._render_text(pdf, content, accent)
     
-    full_path = f"{clean_filename}.pdf"
+    full_path = f"{safe_filename}.pdf"
     pdf.output(full_path)
     return full_path
 
