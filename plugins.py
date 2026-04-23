@@ -91,11 +91,11 @@ class DynamicPDF(FPDF):
         self.cell(0, 15, self.style.get("title", "Insurance Report").upper(), align="C")
         self.ln(20)
 
-@kernel_function(
+    @kernel_function(
     description="Generates a professional PDF report.",
     name="CreateCustomPDF"
-)
-def create_custom_pdf(self, content: str, filename: str = "Insurance_Report") -> str:
+    )
+    def create_custom_pdf(self, content: str, filename: str = "Insurance_Report") -> str:
     # 1. Define the filename clearly first
     safe_filename = filename.replace(' ', '_')
     
