@@ -9,17 +9,9 @@ import streamlit as st
 import asyncio, os
 from dotenv import load_dotenv
 # Semantic Kernel Imports
-# Semantic Kernel Imports
 from semantic_kernel import Kernel
+from semantic_kernel.connectors.ai.google import GoogleAIChatCompletion, GoogleAIPromptExecutionSettings
 from semantic_kernel.connectors.ai.function_choice_behavior import FunctionChoiceBehavior
-
-# DYNAMIC IMPORT: This bypasses the "ModuleNotFoundError" by searching the library directly
-try:
-    from semantic_kernel.connectors.ai.google import GoogleAIChatCompletion, GoogleAIPromptExecutionSettings
-except ImportError:
-    # Fallback for older/newer sub-structures
-    from semantic_kernel.connectors.ai.google.google_ai import GoogleAIChatCompletion, GoogleAIPromptExecutionSettings
-
 from plugins import InsuranceWorkPlugin, WebSearchPlugin
 
 
