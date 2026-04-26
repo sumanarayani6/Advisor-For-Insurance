@@ -1,7 +1,11 @@
+# --- requirements.txt ---
 streamlit
 python-dotenv
 fpdf2
 duckduckgo_search
 nest_asyncio
 pypdf
+# Explicitly allow the pre-release version the kernel needs
+azure-ai-agents>=1.2.0b3
+# Then install the kernel
 semantic-kernel[google]==1.41.2
