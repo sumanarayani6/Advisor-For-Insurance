@@ -1,10 +1,3 @@
-try:
-    __import__('pysqlite3')
-    import sys
-    sys.modules['sqlite3'] = sys.modules.pop('pysqlite3')
-except ImportError:
-    pass
-
 import streamlit as st
 import asyncio, os
 from dotenv import load_dotenv
@@ -35,8 +28,11 @@ async def run_agent(user_input, chat_history):
     
     # Configure the "Auto" behavior
     settings = GoogleAIPromptExecutionSettings(
-        function_choice_behavior=FunctionChoiceBehavior.Auto()
-    )
+    function_choice_behavior=FunctionChoiceBehavior.Auto(),
+    # Some hosted versions of SK need this explicitly if the model 
+    # returns unexpected reasoning parts
+    extra_parameters={"include_thoughts": False} 
+)
 
     # Combine history and new prompt for Gemini's memory
    # Change the prompt_with_context to be more "Command" oriented
