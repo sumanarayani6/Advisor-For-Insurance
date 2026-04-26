@@ -11,59 +11,47 @@ from plugins import InsuranceWorkPlugin, WebSearchPlugin
 
 load_dotenv()
 
-# --- AGENT LOGIC ---
 async def run_agent(user_input, chat_history):
-    # Initialize the kernel normally
+    from google import genai
+
+    # Initialize Gemini client
+    client = genai.Client(api_key=os.getenv("GEMINI_API_KEY"))
+
+    # Initialize Kernel (only for plugins)
     kernel = Kernel()
-    
-    # Add the Gemini Service
-    kernel.add_service(GoogleAIChatCompletion(
-        gemini_model_id="gemini-3-flash-preview", 
-        api_key=os.getenv("GEMINI_API_KEY")
-    ))
-    
-    # Register your plugins
     kernel.add_plugin(WebSearchPlugin(), plugin_name="Searcher")
     kernel.add_plugin(InsuranceWorkPlugin(), plugin_name="Worker")
-    
-    # Configure the "Auto" behavior
-    settings = GoogleAIPromptExecutionSettings(
-    function_choice_behavior=FunctionChoiceBehavior.Auto(),
-    # Some hosted versions of SK need this explicitly if the model 
-    # returns unexpected reasoning parts
-    extra_parameters={"include_thoughts": False} 
-)
 
-    # Combine history and new prompt for Gemini's memory
-   # Change the prompt_with_context to be more "Command" oriented
+    # Build prompt
     prompt_with_context = (
-    "You are a Senior Insurance Advisor. You have two sources of truth: "
-    "1. The 'KnowledgeBase' (Use this first for policy facts). "
-    "2. The 'Searcher' (Use this ONLY for current pricing or news). "
-    
-    "CRITICAL INSTRUCTIONS: "
-    "- Do NOT let search results override your logical reasoning. "
-    "- If search results are messy or 'noisy', ignore the junk and use your internal "
-    "knowledge of insurance principles to fill the gaps. "
-    "- If a tool fails, stay professional and use the information you ALREADY HAVE "
-    "to provide a helpful estimate instead of an apology."
-    "If the user asks you to calculate premium, you MUST have the following data from the user: "
-    "1. Age, 2. Tobacco/Smoking Status, 3. Any Pre-Existing Diseases (PED), 4. Number of claim-free years (NCB). "
-    
-    "INSTRUCTIONS: "
-    "Only do the premium calcualtion if the user asks otherwise don't do"
-    "- If the user hasn't provided these, ask for them politely one by one or as a list. "
-    "- Once you have the data, call 'MathEngine-CalculatePremium' to get the final numbers. "
-    "- Use the 2026 GST rule (0 percent for health) in your explanation.\n"
-    f"--- HISTORY ---\n{chat_history}\n"
-    f"--- REQUEST ---\n{user_input}"
-)
-    # Invoke the prompt
-    result = await kernel.invoke_prompt(
-        prompt=prompt_with_context,
-        settings=settings
+        "You are a Senior Insurance Advisor. You have two sources of truth: "
+        "1. The 'KnowledgeBase' (Use this first for policy facts). "
+        "2. The 'Searcher' (Use this ONLY for current pricing or news). "
+
+        "CRITICAL INSTRUCTIONS: "
+        "- Do NOT let search results override your logical reasoning. "
+        "- If search results are messy or noisy, ignore junk and reason properly. "
+        "- If a tool fails, still give a helpful estimate.\n"
+
+        "If the user asks for premium calculation, you MUST have:\n"
+        "1. Age\n2. Smoking Status\n3. Pre-existing Diseases\n4. Claim-free years\n"
+
+        "Only calculate if explicitly asked.\n"
+        "Only do the premium calcualtion if the user asks otherwise don't do"
+        "- If the user hasn't provided these, ask for them politely one by one or as a list. "
+        "- Once you have the data, call 'MathEngine-CalculatePremium' to get the final numbers. "
+        "- Use the 2026 GST rule (0 percent for health) in your explanation.\n"
+        f"\n--- HISTORY ---\n{chat_history}\n"
+        f"\n--- REQUEST ---\n{user_input}"
     )
-    return result
+
+    # Call Gemini
+    response = client.models.generate_content(
+        model='gemini-3-flash-preview",
+        contents=prompt_with_context
+    )
+
+    return response.text
 
 # --- STREAMLIT UI SETUP ---
 st.set_page_config(page_title="Insurance AI", page_icon="🛡️")
