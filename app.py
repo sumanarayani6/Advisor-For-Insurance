@@ -20,7 +20,7 @@ async def run_agent(user_input, chat_history):
     # 2. Add the Gemini 3 Flash Service
     # Using the 'google_ai' connector specifically for preview models
     kernel.add_service(GoogleAIChatCompletion(
-        gemini_model_id="gemini-3-flash-preview",
+        gemini_model_id="gemini-1.5-flash",
         api_key=os.getenv("GEMINI_API_KEY")
     ))
 
