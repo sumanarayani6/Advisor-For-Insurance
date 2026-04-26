@@ -4,7 +4,6 @@ from dotenv import load_dotenv
 
 # Semantic Kernel Imports
 from semantic_kernel import Kernel
-import google.generativeai as genai
 from plugins import InsuranceWorkPlugin, WebSearchPlugin
 
 load_dotenv()
