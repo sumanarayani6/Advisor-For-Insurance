@@ -5,53 +5,65 @@ from dotenv import load_dotenv
 # Semantic Kernel Imports
 from semantic_kernel import Kernel
 import google.generativeai as genai
-from semantic_kernel.connectors.ai.function_choice_behavior import FunctionChoiceBehavior
-from semantic_kernel.connectors.ai.google.google_ai.google_ai_prompt_execution_settings import GoogleAIPromptExecutionSettings
 from plugins import InsuranceWorkPlugin, WebSearchPlugin
 
 load_dotenv()
 
+from semantic_kernel.connectors.ai.google_ai import GoogleAIChatCompletion, GoogleAIPromptExecutionSettings
+from semantic_kernel.connectors.ai.function_choice_behavior import FunctionChoiceBehavior
+
 async def run_agent(user_input, chat_history):
-    from google import genai
-
-    # Initialize Gemini client
-    client = genai.Client(api_key=os.getenv("GEMINI_API_KEY"))
-
-    # Initialize Kernel (only for plugins)
+    # 1. Initialize the Kernel
     kernel = Kernel()
+    
+    # 2. Add the Gemini 3 Flash Service
+    # Using the 'google_ai' connector specifically for preview models
+    kernel.add_service(GoogleAIChatCompletion(
+        gemini_model_id="gemini-3-flash-preview",
+        api_key=os.getenv("GEMINI_API_KEY")
+    ))
+
+    # 3. Add your specialized plugins
     kernel.add_plugin(WebSearchPlugin(), plugin_name="Searcher")
     kernel.add_plugin(InsuranceWorkPlugin(), plugin_name="Worker")
 
-    # Build prompt
+    # 4. Set up 'Auto' Function Calling
+    # This is the "brain" that lets Gemini choose to use your plugins
+    settings = GoogleAIPromptExecutionSettings(
+        function_choice_behavior=FunctionChoiceBehavior.Auto()
+    )
+
+    # 5. System Instructions
     prompt_with_context = (
         "You are a Senior Insurance Advisor. You have two sources of truth: "
         "1. The 'KnowledgeBase' (Use this first for policy facts). "
         "2. The 'Searcher' (Use this ONLY for current pricing or news). "
-
-        "CRITICAL INSTRUCTIONS: "
-        "- Do NOT let search results override your logical reasoning. "
-        "- If search results are messy or noisy, ignore junk and reason properly. "
-        "- If a tool fails, still give a helpful estimate.\n"
-
-        "If the user asks for premium calculation, you MUST have:\n"
-        "1. Age\n2. Smoking Status\n3. Pre-existing Diseases\n4. Claim-free years\n"
-
-        "Only calculate if explicitly asked.\n"
-        "Only do the premium calcualtion if the user asks otherwise don't do"
-        "- If the user hasn't provided these, ask for them politely one by one or as a list. "
-        "- Once you have the data, call 'MathEngine-CalculatePremium' to get the final numbers. "
-        "- Use the 2026 GST rule (0 percent for health) in your explanation.\n"
-        f"\n--- HISTORY ---\n{chat_history}\n"
-        f"\n--- REQUEST ---\n{user_input}"
+    
+    "CRITICAL INSTRUCTIONS: "
+    "- Do NOT let search results override your logical reasoning. "
+    "- If search results are messy or 'noisy', ignore the junk and use your internal "
+    "knowledge of insurance principles to fill the gaps. "
+    "- If a tool fails, stay professional and use the information you ALREADY HAVE "
+    "to provide a helpful estimate instead of an apology."
+    "If the user asks you to calculate premium, you MUST have the following data from the user: "
+    "1. Age, 2. Tobacco/Smoking Status, 3. Any Pre-Existing Diseases (PED), 4. Number of claim-free years (NCB). "
+    
+    "INSTRUCTIONS: "
+    "Only do the premium calcualtion if the user asks otherwise don't do"
+    "- If the user hasn't provided these, ask for them politely one by one or as a list. "
+    "- Once you have the data, call 'MathEngine-CalculatePremium' to get the final numbers. "
+    "- Use the 2026 GST rule (0 percent for health) in your explanation.\n"
+        f"--- HISTORY ---\n{chat_history}\n"
+        f"--- REQUEST ---\n{user_input}"
     )
 
-    # Call Gemini
-    response = client.models.generate_content(
-        model="gemini-3-flash-preview",
-        contents=prompt_with_context
+    # 6. Run the Kernel with the instructions and settings
+    result = await kernel.invoke_prompt(
+        prompt=prompt_with_context,
+        settings=settings
     )
 
-    return response.text
+    return str(result)
 
 # --- STREAMLIT UI SETUP ---
 st.set_page_config(page_title="Insurance AI", page_icon="🛡️")
