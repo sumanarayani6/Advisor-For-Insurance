@@ -1,8 +1,9 @@
 # requirements.txt
 streamlit
-semantic-kernel>=1.41.0  # Crucial for Gemini 3 thinking-block support
+#semantic-kernel>=1.41.0  # Crucial for Gemini 3 thinking-block support
 google-generativeai>=0.8.0
 python-dotenv
 fpdf2
 duckduckgo_search
 nest_asyncio
+semantic-kernel[google]
