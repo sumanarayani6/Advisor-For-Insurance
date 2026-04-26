@@ -8,11 +8,10 @@ import google.generativeai as genai
 from plugins import InsuranceWorkPlugin, WebSearchPlugin
 
 load_dotenv()
-try:
-    from semantic_kernel.connectors.ai.google_ai import GoogleAIChatCompletion, GoogleAIPromptExecutionSettings
-except ImportError:
-    # FALLBACK FOR 1.41.2 ENVIRONMENTS
-    from semantic_kernel.connectors.ai.google import GoogleAIChatCompletion, GoogleAIPromptExecutionSettings
+# Semantic Kernel Imports
+from semantic_kernel import Kernel
+from semantic_kernel.connectors.ai.google import GoogleAIChatCompletion, GoogleAIPromptExecutionSettings
+from semantic_kernel.connectors.ai.function_choice_behavior import FunctionChoiceBehavior
 from semantic_kernel.connectors.ai.function_choice_behavior import FunctionChoiceBehavior
 
 async def run_agent(user_input, chat_history):
