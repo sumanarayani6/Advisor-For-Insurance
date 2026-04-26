@@ -3,9 +3,6 @@ from email.message import EmailMessage
 from fpdf import FPDF, XPos, YPos
 from duckduckgo_search import DDGS
 from semantic_kernel.functions import kernel_function
-
-
-import chromadb
 from pypdf import PdfReader
 from semantic_kernel.functions import kernel_function
 import uuid
