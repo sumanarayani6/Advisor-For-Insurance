@@ -47,7 +47,7 @@ async def run_agent(user_input, chat_history):
 
     # Call Gemini
     response = client.models.generate_content(
-        model='gemini-3-flash-preview",
+        model="gemini-3-flash-preview",
         contents=prompt_with_context
     )
 
